@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#faf7f2" />
+<title>Studio Membership Giveaway</title>
+<style>
+:root{--orange:#df470b;--paper:#faf7f2;--ink:#201d1a;--muted:#77716d;--line:#e5ded7}*{box-sizing:border-box}body{margin:0;background:#fff;color:var(--ink);font-family:Arial,Helvetica,sans-serif}.page{max-width:780px;margin:24px auto;padding:42px 76px 52px;background:var(--paper)}.pill{display:inline-block;background:var(--orange);color:white;font-size:13px;font-weight:800;letter-spacing:1.5px;border-radius:30px;padding:9px 17px}h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(42px,6.5vw,62px);line-height:1.02;letter-spacing:-1.4px;margin:18px 0 14px}.lead{font-size:17px;line-height:1.55;color:var(--muted);margin:0 0 26px}.modes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}.mode{background:white;border:1px solid var(--line);border-radius:13px;text-align:center;padding:16px 10px;cursor:pointer;font-size:16px;color:var(--ink)}.mode strong,.mode span{display:block}.mode span{color:var(--muted);font-size:14px;margin-top:4px}.mode.selected{border:2px solid var(--orange);padding:15px 9px;background:#fff8f3}.form-card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:24px}label.field{display:block;font-size:14px;font-weight:700;margin:0 0 8px}.control{width:100%;height:50px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:0 13px;font:inherit;font-size:15px;color:var(--ink);margin-bottom:19px}.control:focus{outline:2px solid #f0a280;outline-offset:1px}.consent{display:flex;gap:11px;align-items:flex-start;color:#655f5b;font-size:13px;font-weight:600;line-height:1.55;margin:0 0 19px}.consent input{width:18px;height:18px;accent-color:var(--orange);flex-shrink:0;margin:1px 0 0}button.submit{border:0;background:var(--orange);color:#fff;border-radius:10px;width:100%;padding:16px;font-size:17px;font-weight:800;cursor:pointer}button.submit:hover{background:#c63c07}button.submit:disabled{opacity:.65;cursor:wait}.fine{text-align:center;color:var(--muted);font-size:12px;margin:22px 0 0}.message{display:none;border-radius:10px;padding:13px;margin:0 0 18px;font-size:14px;line-height:1.5}.message.show{display:block}.message.success{background:#eaf6ed;color:#205b32}.message.error{background:#fff0eb;color:#96330d}@media(max-width:650px){.page{margin:0;padding:35px 20px 40px;min-height:100vh}.form-card{padding:20px 17px}h1{font-size:46px}.lead{font-size:16px}.mode{font-size:14px}.mode span{font-size:12px}}
+</style>
+</head>
+<body>
+<main class="page">
+  <span class="pill">GIVEAWAY</span>
+  <h1>Win 1 of 5 free memberships</h1>
+  <p class="lead">Enter your details for a chance to win a free membership at our studio.</p>
+  <div class="modes" aria-label="Membership types">
+    <button class="mode" type="button" data-choice="online"><strong>Join online</strong><span>Train from anywhere</span></button>
+    <button class="mode" type="button" data-choice="offline"><strong>Join offline</strong><span>Come to the studio</span></button>
+  </div>
+  <form class="form-card" id="giveawayForm">
+    <div id="message" class="message" role="status" aria-live="polite"></div>
+    <label class="field" for="name">Full name</label>
+    <input class="control" id="name" name="name" autocomplete="name" maxlength="120" required />
+    <label class="field" for="email">Email</label>
+    <input class="control" id="email" name="email" type="email" autocomplete="email" maxlength="254" required />
+    <label class="field" for="phone">Phone number</label>
+    <input class="control" id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" minlength="7" maxlength="20" pattern="[0-9+() .-]{7,20}" required />
+    <label class="field" for="preference">How would you like to join?</label>
+    <select class="control" id="preference" name="preference" required>
+      <option value="either">Either, I’m flexible</option>
+      <option value="online">Online</option>
+      <option value="offline">Offline</option>
+    </select>
+    <label class="consent"><input type="checkbox" name="consent" required /><span>I agree to be contacted by the studio about this giveaway. My details won’t be shared with anyone else.</span></label>
+    <button class="submit" type="submit">Enter the giveaway</button>
+  </form>
+  <p class="fine">One entry per person. Winners are chosen at random.</p>
+</main>
+<script>
+const form=document.getElementById('giveawayForm');
+const preference=document.getElementById('preference');
+const message=document.getElementById('message');
+const choices=[...document.querySelectorAll('.mode')];
+function syncChoice(){choices.forEach(b=>{const selected=b.dataset.choice===preference.value;b.classList.toggle('selected',selected);b.setAttribute('aria-pressed',String(selected));});}
+choices.forEach(b=>b.addEventListener('click',()=>{preference.value=b.dataset.choice;syncChoice();}));
+preference.addEventListener('change',syncChoice);syncChoice();
+function showMessage(text,type){message.textContent=text;message.className='message show '+type;}
+form.addEventListener('submit',async e=>{
+ e.preventDefault();
+ if(!form.reportValidity())return;
+ // Replace this placeholder with your actual API endpoint once configured.
+ const API_ENDPOINT='';
+ if(!API_ENDPOINT){showMessage('Demo mode: your form is valid, but no entry has been submitted. Connect a secure backend to accept giveaway entries.','error');return;}
+ const button=form.querySelector('.submit');button.disabled=true;button.textContent='Submitting…';
+ try{
+  const payload={name:form.elements.name.value.trim(),email:form.elements.email.value.trim(),phone:form.elements.phone.value.trim(),preference:preference.value,consent:form.elements.consent.checked};
+  const response=await fetch(API_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  if(!response.ok)throw new Error('Submission failed');
+  form.reset();syncChoice();showMessage('You’re entered! Thanks for joining the giveaway.','success');
+ }catch(err){showMessage('We couldn’t submit your entry. Please try again.','error');}
+ finally{button.disabled=false;button.textContent='Enter the giveaway';}
+});
+</script>
+</body>
+</html>
