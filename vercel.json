@@ -1,0 +1,7 @@
+{
+  "functions": { "api/entries.js": { "maxDuration": 60 } },
+  "rewrites": [
+    { "source": "/CYS", "destination": "/index.html" },
+    { "source": "/CYS/", "destination": "/index.html" }
+  ]
+}

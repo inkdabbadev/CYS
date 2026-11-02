@@ -49,14 +49,13 @@ function showMessage(text,type){message.textContent=text;message.className='mess
 form.addEventListener('submit',async e=>{
  e.preventDefault();
  if(!form.reportValidity())return;
- // Replace this placeholder with your actual API endpoint once configured.
- const API_ENDPOINT='';
- if(!API_ENDPOINT){showMessage('Demo mode: your form is valid, but no entry has been submitted. Connect a secure backend to accept giveaway entries.','error');return;}
  const button=form.querySelector('.submit');button.disabled=true;button.textContent='Submitting…';
  try{
   const payload={name:form.elements.name.value.trim(),email:form.elements.email.value.trim(),phone:form.elements.phone.value.trim(),preference:preference.value,consent:form.elements.consent.checked};
-  const response=await fetch(API_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-  if(!response.ok)throw new Error('Submission failed');
+  const result=await fetch('/api/entries',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const response=await result.json();
+  if(!result.ok && response.ok)throw new Error('Submission failed');
+  if(!response?.ok){showMessage(response?.message || 'We could not save your entry. Please try again.','error');return;}
   form.reset();syncChoice();showMessage('You’re entered! Thanks for joining the giveaway.','success');
  }catch(err){showMessage('We couldn’t submit your entry. Please try again.','error');}
  finally{button.disabled=false;button.textContent='Enter the giveaway';}
